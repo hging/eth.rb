@@ -185,7 +185,7 @@ module Eth
       unless args.empty?
         data += encode_constructor_params(contract, args)
       end
-      gas_limit = Tx.estimate_intrinsic_gas(data) + Tx::CREATE_GAS
+      gas_limit = kwargs[:gas_limit] || Tx.estimate_intrinsic_gas(data) + Tx::CREATE_GAS
       params = {
         value: 0,
         gas_limit: gas_limit,
@@ -268,7 +268,7 @@ module Eth
     #   @param address [String] contract address.
     # @return [Object] returns the result of the call.
     def transact(contract, function_name, *args, **kwargs)
-      gas_limit = Tx.estimate_intrinsic_gas(contract.bin) + Tx::CREATE_GAS
+      gas_limit = kwargs[:gas_limit] || Tx.estimate_intrinsic_gas(contract.bin) + Tx::CREATE_GAS
       fun = contract.functions.select { |func| func.name == function_name }[0]
       params = {
         value: 0,
@@ -393,7 +393,7 @@ module Eth
 
     # Non-transactional function call called from call().
     def call_raw(contract, func, *args, **kwargs)
-      gas_limit = Tx.estimate_intrinsic_gas(contract.bin) + Tx::CREATE_GAS
+      gas_limit = kwargs[:gas_limit] || Tx.estimate_intrinsic_gas(contract.bin) + Tx::CREATE_GAS
       params = {
         gas_limit: gas_limit,
         chain_id: chain_id,

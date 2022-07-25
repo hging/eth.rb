@@ -271,7 +271,7 @@ module Eth
       gas_limit = kwargs[:gas_limit] || Tx.estimate_intrinsic_gas(contract.bin) + Tx::CREATE_GAS
       fun = contract.functions.select { |func| func.name == function_name }[0]
       params = {
-        value: 0,
+        value: kwargs[:value] || 0,
         gas_limit: gas_limit,
         chain_id: chain_id,
         to: kwargs[:address] || contract.address,

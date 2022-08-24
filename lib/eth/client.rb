@@ -111,7 +111,7 @@ module Eth
     # @param sender_key [Eth::Key] the sender private key.
     # @param legacy [Boolean] enables legacy transactions (pre-EIP-1559).
     # @return [String] the transaction hash.
-    def transfer(destination, amount, sender_key = nil, legacy = false)
+    def transfer(destination, amount, sender_key = nil, gas_limit = 21_000, legacy = false)
       params = {
         value: amount,
         to: destination,

@@ -86,7 +86,7 @@ module Eth
     # @param address [Eth::Address] the address to get the nonce for.
     # @return [Integer] the next nonce to be used.
     def get_nonce(address, block = "pending")
-      eth_get_transaction_count(address, "pending")["result"].to_i 16
+      eth_get_transaction_count(address, block)["result"].to_i 16
     end
 
     # Simply transfer Ether to an account and waits for it to be mined.

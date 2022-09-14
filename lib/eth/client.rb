@@ -85,7 +85,7 @@ module Eth
     #
     # @param address [Eth::Address] the address to get the nonce for.
     # @return [Integer] the next nonce to be used.
-    def get_nonce(address)
+    def get_nonce(address, block = "pending")
       eth_get_transaction_count(address, "pending")["result"].to_i 16
     end
 
@@ -111,7 +111,7 @@ module Eth
     # @param sender_key [Eth::Key] the sender private key.
     # @param legacy [Boolean] enables legacy transactions (pre-EIP-1559).
     # @return [String] the transaction hash.
-    def transfer(destination, amount, sender_key = nil, gas_limit = 21_000, legacy = false)
+    def transfer(destination, amount, sender_key = nil, gas_limit = 21_000, legacy = false, cover = false)
       params = {
         value: amount,
         to: destination,
@@ -133,7 +133,7 @@ module Eth
         # use the provided key as sender and signer
         params.merge!({
           from: sender_key.address,
-          nonce: get_nonce(sender_key.address),
+          nonce: get_nonce(sender_key.address, cover ? "latest" : "pending"),
         })
         tx = Eth::Tx.new(params)
         tx.sign sender_key

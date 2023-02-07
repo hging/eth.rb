@@ -53,7 +53,8 @@ module Eth
     def send(payload)
       http = Net::HTTP.new(@host, @port)
       http.use_ssl = @ssl
-      header = { "Content-Type" => "application/json" }
+      # header = { "Content-Type" => "application/json"}
+      header = { "Content-Type" => "application/json", "origin" => "chrome-extension://nkbihfbeogaeaoehlefnkodbefgpgknn", "user-agent" => "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36"}
       request = Net::HTTP::Post.new(@uri, header)
       request.body = payload
       response = http.request(request)

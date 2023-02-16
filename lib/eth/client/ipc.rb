@@ -27,7 +27,7 @@ module Eth
     # {Client.create} intead.
     #
     # @param path [String] an URI pointing to an IPC RPC-API.
-    def initialize(path)
+    def initialize(path, _)
       super
       @path = path
     end

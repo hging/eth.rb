@@ -44,15 +44,15 @@ module Eth
     # @return [Eth::Client::Ipc] an IPC client.
     # @return [Eth::Client::Http] an HTTP client.
     # @raise [ArgumentError] in case it cannot determine the client type.
-    def self.create(host)
+    def self.create(host, proxy = nil)
       return Client::Ipc.new host if host.end_with? ".ipc"
-      return Client::Http.new host if host.start_with? "http"
+      return Client::Http.new(host, proxy) if host.start_with? "http"
       raise ArgumentError, "Unable to detect client type!"
     end
 
     # Constructor for the {Eth::Client} super-class. Should not be used;
     # use {Client.create} intead.
-    def initialize(_)
+    def initialize(_, _)
       @id = 0
       @max_priority_fee_per_gas = 0
       @max_fee_per_gas = Tx::DEFAULT_GAS_PRICE

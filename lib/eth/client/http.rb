@@ -36,7 +36,7 @@ module Eth
     # {Client.create} intead.
     #
     # @param host [String] an URI pointing to an HTTP RPC-API.
-    def initialize(host)
+    def initialize(host, proxy = nil)
       super
       uri = URI.parse(host)
       raise ArgumentError, "Unable to parse the HTTP-URI!" unless ["http", "https"].include? uri.scheme
@@ -44,6 +44,7 @@ module Eth
       @port = uri.port
       @ssl = uri.scheme == "https"
       @uri = URI("#{uri.scheme}://#{@host}:#{@port}#{uri.path}")
+      @proxy = proxy
     end
 
     # Sends an RPC request to the connected HTTP client.
@@ -51,14 +52,29 @@ module Eth
     # @param payload [Hash] the RPC request parameters.
     # @return [String] a JSON-encoded response.
     def send(payload)
-      http = Net::HTTP.new(@host, @port)
-      http.use_ssl = @ssl
-      header = { "Content-Type" => "application/json"}
-      # header = { "Content-Type" => "application/json", "User-Agent" => "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/109.0"}
-      request = Net::HTTP::Post.new(@uri, header)
-      request.body = payload
-      response = http.request(request)
-      response.body
+      if @proxy.present?
+        proxy_info = Net::HTTP::Proxy(@proxy[:host].split(':')[0], @proxy[:host].split(':')[1], @proxy[:username], @proxy[:password])
+        http = Net::HTTP.new(@host, @port)
+        http.use_ssl = @ssl
+        header = { "Content-Type" => "application/json"}
+        # header = { "Content-Type" => "application/json", "User-Agent" => "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/109.0"}
+        request = Net::HTTP::Post.new(@uri, header)
+        request.basic_auth(@proxy[:username], @proxy[:password])
+        request.body = payload
+        response = proxy_info.start(uri.hostname, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+          http.request(request)
+        end
+        response.body
+      else
+        http = Net::HTTP.new(@host, @port)
+        http.use_ssl = @ssl
+        header = { "Content-Type" => "application/json"}
+        # header = { "Content-Type" => "application/json", "User-Agent" => "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/109.0"}
+        request = Net::HTTP::Post.new(@uri, header)
+        request.body = payload
+        response = http.request(request)
+        response.body
+      end
     end
   end
 end
